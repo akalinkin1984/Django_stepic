@@ -6,7 +6,15 @@
 
 </head>
 <body>
-<p>{{ menu | join:' | ' }}</p> <!-- объединяет список в строку с указанием разделителя -->
+<ul>
+    <li><a href="{% url 'home' %}">Главная страница</a> </li>
+    {% for m in menu %}
+    {% if not forloop.last %}<li>{% else %}<li class="last">{% endif %} <!-- если не последний элемент ставим тег li, а если последний с классом last-->
+        <a href="{% url m.url_name %}">{{ m.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<!--<p>{{ menu | join:' | ' }}</p> &lt;!&ndash; объединяет список в строку с указанием разделителя &ndash;&gt;-->
 <h1>{{ title }}</h1>
 
 <ul>
@@ -15,6 +23,7 @@
     <li>
         <h2>{{ p.title }}</h2>
         <p>{{ p.content }}</p>
+        <p><a href="{% url 'post' p.id %}">Читать пост</a></p> <!-- тег url формирует ссылку по имени маршрута -->
         {% if not forloop.last %} <!-- если не последняя итерация цикла for -->
         <hr>
         {% endif %}
