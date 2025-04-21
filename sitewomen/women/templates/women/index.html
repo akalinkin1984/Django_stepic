@@ -1,35 +1,17 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
+{% extends 'base.html' %}
 
-</head>
-<body>
-<ul>
-    <li><a href="{% url 'home' %}">Главная страница</a> </li>
-    {% for m in menu %}
-    {% if not forloop.last %}<li>{% else %}<li class="last">{% endif %} <!-- если не последний элемент ставим тег li, а если последний с классом last-->
-        <a href="{% url m.url_name %}">{{ m.title }}</a>
-    </li>
-    {% endfor %}
+{% block content %}
+<ul class="list-articles">
+	{% for p in posts %}
+	{% if p.is_published %}
+			<li><h2>{{p.title}}</h2>
+	{% autoescape off %}
+	{{p.content|linebreaks|truncatewords:20}}
+	{% endautoescape %}
+			<div class="clear"></div>
+			<p class="link-read-post"><a href="{% url 'post' p.id %}">Читать пост</a></p>
+			</li>
+	{% endif %}
+	{% endfor %}
 </ul>
-<!--<p>{{ menu | join:' | ' }}</p> &lt;!&ndash; объединяет список в строку с указанием разделителя &ndash;&gt;-->
-<h1>{{ title }}</h1>
-
-<ul>
-    {% for p in posts %}
-    {% if p.is_published %}
-    <li>
-        <h2>{{ p.title }}</h2>
-        <p>{{ p.content }}</p>
-        <p><a href="{% url 'post' p.id %}">Читать пост</a></p> <!-- тег url формирует ссылку по имени маршрута -->
-        {% if not forloop.last %} <!-- если не последняя итерация цикла for -->
-        <hr>
-        {% endif %}
-    </li>
-    {% endif %}
-    {% endfor %}
-</ul>
-</body>
-</html>
+{% endblock %}

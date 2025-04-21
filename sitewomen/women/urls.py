@@ -12,6 +12,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('login/', views.login, name='login'),
     path('post/<int:post_id>/', views.show_post, name='post'),
+    path('category/<int:cat_id>/', views.show_category, name='category'),
     # path('cats/<int:cat_id>/', views.categories, name='cats_id'), # рекомендуется использовать name, для обращения к url в программе
     # path('cats/<slug:cat_slug>/', views.categories_by_slug, name='cats'),
     # # re_path(r'^archive/(?P<year>[0-9]{4})/', views.archive), # использование регулярных выражений в пути

@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-nu$rsnglw-+_)vrm1@m_8*=4wqgdp(yqddfexhm@ztcqjvjx6k
 #
 # ALLOWED_HOSTS = []
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
@@ -59,7 +59,9 @@ ROOT_URLCONF = 'sitewomen.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
