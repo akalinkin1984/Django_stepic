@@ -19,6 +19,7 @@ class Women(models.Model):
     time_create = models.DateTimeField(auto_now_add=True)
     time_update = models.DateTimeField(auto_now=True)
     is_published = models.BooleanField(choices=Status.choices, default=Status.DRAFT)
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, related_query_name='posts')
 
     objects = models.Manager() # указываем менеджер objects, иначе он перестанет работать после определения своего менеджера
     published = PublishedManager() # определяем свой менеджер
@@ -34,3 +35,11 @@ class Women(models.Model):
 
     def get_absolute_url(self): # возвращает url каждой записи таблицы
         return reverse('post', kwargs={'post_slug': self.slug})
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True)
+
+    def __str__(self):
+        return self.name
