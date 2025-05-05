@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 from women import views
 
@@ -24,7 +25,7 @@ urlpatterns = [
     # path('', views.index),
     # path('cats/', views.categories),
     path('', include('women.urls')) # подключение путей из файла women.urls
-]
+] + debug_toolbar_urls()
 
 handler404 = views.page_not_found # переопределяем обработчик 404 на свой, если DEBUG = False и в ALLOWED_HOSTS добавлен разрешенный хост(127.0.0.1)
 # Аналогичным образом можно переопределять обработчики других исключений, например:

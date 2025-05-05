@@ -68,3 +68,10 @@ class Husband(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ShopItem(models.Model):
+    name = models.CharField(max_length=100)
+    weight = models.IntegerField(blank=True, default=0)
+    price = models.IntegerField(default=0)
+    is_exists = models.BooleanField(default=True)
