@@ -1,8 +1,16 @@
 from django.db import models
 from django.urls import reverse
+from django.template.defaultfilters import slugify
 
 
-# Create your models here.
+def translit_to_eng(s: str) -> str: # функция для определения слага для русских букв
+    d = {'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd',
+         'е': 'e', 'ë': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i', 'к': 'k',
+         'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r',
+         'с': 'c', 'т': 't', 'у': 'u', 'ф': 'f', 'x': 'h', 'ц': 'c', 'ч': 'ch',
+         'ш': 'sh', 'щ': 'shch', 'ь': '', 's': 'y', 'ъ': '', 'э': 'r', 'ю': 'yu', 'я': 'ya'}
+
+    return "".join(map(lambda x: d[x] if d.get(x, False) else x, s.lower()))
 class PublishedManager(models.Manager): # определяем класс своего менеджера модели
     def get_queryset(self):
         return super().get_queryset().filter(is_published=Women.Status.PUBLISHED)
@@ -41,6 +49,10 @@ class Women(models.Model):
 
     def get_absolute_url(self): # возвращает url каждой записи таблицы, так же определяет наличие кнопки смотреть на сайте в админ панели
         return reverse('post', kwargs={'post_slug': self.slug})
+
+    # def save(self, *args, **kwargs): # (вариант 1)метод для автоматического формирования слага(работает только с англ. буквами, для русских букв используем свою функцию)
+    #     self.slug = slugify(translit_to_eng(self.title))
+    #     super().save(*args, **kwargs)
 
 
 class Category(models.Model):
