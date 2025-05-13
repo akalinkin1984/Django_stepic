@@ -9,4 +9,3 @@ class AddPostForm(forms.Form): # определяем класс для отоб
     is_published = forms.BooleanField(required=False)
     cat = forms.ModelChoiceField(queryset=Category.objects.all()) # выпадающий список
     husband = forms.ModelChoiceField(queryset=Husband.objects.all(), required=False) # выпадающий список
-    
