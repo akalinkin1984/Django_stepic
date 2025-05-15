@@ -1,11 +1,13 @@
+import uuid
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify # можем использовать шаблонные фильтры как функции
 
-from .models import Women, Category, TagPost
-from .forms import AddPostForm
+from .models import Women, Category, TagPost, UploadFiles
+from .forms import AddPostForm, UploadFileForm
 
 # menu = ['О сайте', 'Добавить статью', 'Обратная связь', 'Войти']
 
@@ -47,8 +49,25 @@ def index(request):
     return render(request, 'women/index.html', context=data)
 
 
+# def handle_uploaded_file(f): # функция для загрузки файла
+#     name, permission = f.name.split('.')
+#     with open(f"uploads/{name}_{uuid.uuid4()}.{permission}", "wb+") as destination:
+#         for chunk in f.chunks():
+#             destination.write(chunk)
+
+
 def about(request):
-    return render(request, 'women/about.html', {'title': 'О сайте', 'menu': menu})
+    if request.method == 'POST':
+        # handle_uploaded_file(request.FILES['file_upload']) # сохраняет файл
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            # handle_uploaded_file(form.cleaned_data['file']) # сохраняет файл
+            fp = UploadFiles(file=form.cleaned_data['file'])
+            fp.save()
+    else:
+        form = UploadFileForm()
+
+    return render(request, 'women/about.html', {'title': 'О сайте', 'menu': menu, 'form': form})
 
 
 # def categories(request, cat_id):
@@ -100,7 +119,7 @@ def show_post(request, post_slug):
 
 def addpage(request):
     if request.method == 'POST':
-        form = AddPostForm(request.POST)
+        form = AddPostForm(request.POST, request.FILES)
         if form.is_valid():
             # print(form.cleaned_data)
 

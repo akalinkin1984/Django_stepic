@@ -2,7 +2,8 @@
 
 {% block content %}
 <h1>{{ title }}</h1>
-<form action="" method="POST">
+<form action="" method="POST" enctype="multipart/form-data">
+<!--    enctype="multipart/form-data" - обязателен для загрузки файлов-->
 <!--    в action указываем обработчик(в данном случае текущая страница)
 и для передачи данных на сервер указываем метод POST-->
     {% csrf_token %} <!--    указываем для защиты от CSRF-атак-->
