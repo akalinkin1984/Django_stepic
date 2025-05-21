@@ -2,11 +2,11 @@ import uuid
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify # можем использовать шаблонные фильтры как функции
 from django.views import View
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 
 from .models import Women, Category, TagPost, UploadFiles
 from .forms import AddPostForm, UploadFileForm
@@ -141,16 +141,33 @@ def about(request):
 #     return HttpResponse(f'<h1>Архив п годам</h1><p>{year}</p>')
 
 
-def show_post(request, post_slug):
-    post = get_object_or_404(Women, slug=post_slug) # получить 1-у запись из таблицы women по критерию pk=post_idб если запись не найдена генерирует 404
-    data = {
-        'title': post.title,
-        'menu': menu,
-        'post': post,
-        'cat_selected': 1
-    }
+# def show_post(request, post_slug):
+#     post = get_object_or_404(Women, slug=post_slug) # получить 1-у запись из таблицы women по критерию pk=post_idб если запись не найдена генерирует 404
+#     data = {
+#         'title': post.title,
+#         'menu': menu,
+#         'post': post,
+#         'cat_selected': 1
+#     }
+#
+#     return render(request, 'women/post.html', data)
 
-    return render(request, 'women/post.html', data)
+
+class ShowPost(DetailView): # переписали функцию show_post через класс унаследованный от DetailView(для отображения отдельных статей)
+    # model = Women
+    template_name = 'women/post.html'
+    slug_url_kwarg = 'post_slug' # переменная которая фигурирует в маршруте(url)(по-умолчанию используется slug, если статья отбирается не по slug, а по pk, то используем атрибут pk_url_kwarg)
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs): # метод для получения данных из запроса и формирования переменной для шаблона
+            context = super().get_context_data(**kwargs)
+            context['title'] = context['post'].title
+            context['menu'] = menu
+
+            return context
+
+    def get_object(self, queryset=None): # отбираем ту запись которая будет отображаться
+        return get_object_or_404(Women.published, slug=self.kwargs[self.slug_url_kwarg]) # берем только опубликованные записи по слагу
 
 
 # переписали эту функция с помощью класса View
@@ -181,29 +198,79 @@ def show_post(request, post_slug):
 #     return render(request, 'women/addpage.html', data)
 
 
-class AddPage(View): # переписали метод addpage с помощью класса унаследованного от View
-    def get(self, request):
-        form = AddPostForm()
-        data = {
-            'menu': menu,
-            'title': 'Добавление статьи',
-            'form': form
+# class AddPage(View): # переписали метод addpage с помощью класса унаследованного от View
+#     def get(self, request):
+#         form = AddPostForm()
+#         data = {
+#             'menu': menu,
+#             'title': 'Добавление статьи',
+#             'form': form
+#
+#         }
+#         return render(request, 'women/addpage.html', data)
+#
+#     def post(self, request):
+#         form = AddPostForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('home')
+#         data = {
+#             'menu': menu,
+#             'title': 'Добавление статьи',
+#             'form': form
+#
+#         }
+#         return render(request, 'women/addpage.html', data)
 
-        }
-        return render(request, 'women/addpage.html', data)
 
-    def post(self, request):
-        form = AddPostForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-        data = {
-            'menu': menu,
-            'title': 'Добавление статьи',
-            'form': form
+# class AddPage(FormView): # переписали с помощью класса унаследованного от FormView(в шаблон форма будет передаваться через переменную form)
+#     form_class = AddPostForm  # ссылка на класс формы
+#     template_name = 'women/addpage.html'
+#     success_url = reverse_lazy('home')  # url адрес, куда мы должны перенаправиться после успешного добаления статьи(reverse_lazy выстраивает маршрут не сразу, а когда он необходим, в данном случае обычный reverse работать не будет)
+#     extra_context = {
+#         'title': 'Добавление статьи',
+#         'menu': menu
+#     }
+#
+#     def form_valid(self, form): # метод записи введенных в данных в БД(вызывается если были введены корректные данные)
+#         form.save() # сохранить данные в БД
+#         return super().form_valid(form)
 
-        }
-        return render(request, 'women/addpage.html', data)
+
+class AddPage(CreateView): # переписали с помощью класса унаследованного от CreateView(для сохранения данных в БД)
+    # form_valid уже реализован в CreateView
+    form_class = AddPostForm  # ссылка на класс формы(можно вместо формы указать модель и поля)
+    # model = Women
+    # fields = '__all__' # обязательно нужно указать обязательные для заполнения поля
+    template_name = 'women/addpage.html'
+    # success_url = reverse_lazy('home')  # можно не прописывать, т.к. url автоматически берется из функции get_absolute_url модели
+    extra_context = {
+        'title': 'Добавление статьи',
+        'menu': menu
+    }
+
+
+class UpdatePage(UpdateView): # класс для изменения записи
+    model = Women
+    fields = ['title', 'content', 'photo', 'is_published', 'cat'] # обязательно нужно указать обязательные для заполнения поля
+    template_name = 'women/addpage.html'
+    success_url = reverse_lazy('home')
+    extra_context = {
+        'title': 'Редактирование статьи',
+        'menu': menu
+    }
+
+
+class DeletePage(DeleteView): # класс для удаления записи
+    model = Women
+    template_name = 'women/delete_post.html'
+    context_object_name = 'post'
+    success_url = reverse_lazy('home')
+    extra_context = {
+        'title': 'Удаление статьи',
+        'menu': menu,
+        'cat_selected': None
+    }
 
 
 def contact(request):
@@ -258,10 +325,10 @@ class WomenCategory(ListView): # с помощью класс переписал
 #     return render(request, 'women/index.html', context=data)
 
 
-class TagList(ListView):
+class TagPostList(ListView):
     template_name = 'women/index.html'
     context_object_name = 'posts'
-    # allow_empty = False
+    allow_empty = False
 
     def get_queryset(self):
         return Women.published.filter(tags__slug=self.kwargs['tag_slug']).select_related('cat')
@@ -270,6 +337,7 @@ class TagList(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Тег - ' + self.kwargs['tag_slug']
         context['menu'] = menu
+        context['cat_selected'] = None
 
         return context
 

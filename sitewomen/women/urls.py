@@ -14,14 +14,17 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('login/', views.login, name='login'),
     # path('post/<int:post_id>/', views.show_post, name='post'),
-    path('post/<slug:post_slug>/', views.show_post, name='post'),
+    # path('post/<slug:post_slug>/', views.show_post, name='post'),
+    path('post/<slug:post_slug>/', views.ShowPost.as_view(), name='post'),
     # path('category/<int:cat_id>/', views.show_category, name='category'),
     # path('category/<slug:cat_slug>/', views.show_category, name='category'),
     path('category/<slug:cat_slug>/', views.WomenCategory.as_view(), name='category'),
     # path('tag/<slug:tag_slug>/', views.show_tag_postlist, name='tag'),
-    path('tag/<slug:tag_slug>/', views.TagList.as_view(), name='tag'),
+    path('tag/<slug:tag_slug>/', views.TagPostList.as_view(), name='tag'),
     # path('cats/<int:cat_id>/', views.categories, name='cats_id'), # рекомендуется использовать name, для обращения к url в программе
     # path('cats/<slug:cat_slug>/', views.categories_by_slug, name='cats'),
     # # re_path(r'^archive/(?P<year>[0-9]{4})/', views.archive), # использование регулярных выражений в пути
-    # path('archive/<year4:year>/', views.archive, name='archive') # используем свой конвертер
+    # path('archive/<year4:year>/', views.archive, name='archive'), # используем свой конвертер
+    path('edit/<slug:slug>/', views.UpdatePage.as_view(), name='update'),
+    path('delete/<slug:slug>/', views.DeletePage.as_view(), name='delete'),
 ]
