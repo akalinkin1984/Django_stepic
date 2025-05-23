@@ -2,10 +2,24 @@
 
 {% block content %}
 <h1>{{title}}</h1>
-<form action="" method="post" enctype="multipart/form-data"> <!--    если не прописать enctype, загрузка файлов на сервер происходить не будет-->
-    {% csrf_token %}
-<!--    <p><input type="file" name="file_upload"></p> &lt;!&ndash;    если не указываем форму получим ошибку при отправке без файла&ndash;&gt;-->
-    {{ form.as_p }}
-    <p><button type="submit">Отправить</button></p>
-</form>
+<!--ранее этот код использовался для работы с функцией about-->
+<!--<form action="" method="post" enctype="multipart/form-data"> &lt;!&ndash;    если не прописать enctype, загрузка файлов на сервер происходить не будет&ndash;&gt;-->
+<!--    {% csrf_token %}-->
+<!--&lt;!&ndash;    <p><input type="file" name="file_upload"></p> &lt;!&ndash;    если не указываем форму получим ошибку при отправке без файла&ndash;&gt;&ndash;&gt;-->
+<!--    {{ form.as_p }}-->
+<!--    <p><button type="submit">Отправить</button></p>-->
+<!--</form>-->
+{% for item in page_obj %}
+<p>{{ item.pk }}: {{ item.title }}</p>
+{% endfor %}
+
+<nav>
+    <ul>
+        {% for p in page_obj.paginator.page_range %}
+        <li>
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+</nav>
 {% endblock %}

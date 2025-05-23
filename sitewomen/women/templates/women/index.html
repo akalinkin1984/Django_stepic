@@ -23,3 +23,37 @@
 	{% endfor %}
 </ul>
 {% endblock %}
+
+{% block navigation %}
+<!--если есть следующая страница, отображать список пагинации-->
+{% if page_obj.has_other_pages %}
+<nav class="list-pages">
+    <ul>
+<!--		отображать кнопку назад-->
+		{% if page_obj.has_previous %}
+		<li class="page-num">
+			<a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+		</li>
+		{% endif %}
+<!--		отображаем список пагинации-->
+        {% for p in paginator.page_range %}
+		{% if page_obj.number == p %}
+		<li class="page-num page-num-selected">{{ p }}</li>
+<!--		отображаем не все страницы в списке пагинации, а устанавливаем границы(от текущей страницы +-2 страницы)-->
+		{% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
+        <li class="page-num">
+            <a href="?page={{ p }}">{{ p }}</a>
+        </li>
+		{% endif %}
+        {% endfor %}
+
+<!--		отображаем кпопку вперед-->
+		{% if page_obj.has_next %}
+		<li class="page-num">
+			<a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+		</li>
+		{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
