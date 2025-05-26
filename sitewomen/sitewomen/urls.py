@@ -26,7 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.index),
     # path('cats/', views.categories),
-    path('', include('women.urls')) # подключение путей из файла women.urls
+    path('', include('women.urls')), # подключение путей из файла women.urls
+    path('users/', include('users.urls', namespace='users')) # подключение путей из файла users.urls(namespace - пространство имен, напр. чтобы обратиться к маршруту login, пишем "users:login")
 ] + debug_toolbar_urls()
 
 if settings.DEBUG: # добавляем маршрут который связывает префикс MEDIA_URL с маршрутом MEDIA_ROOT, для отображения фото в режиме DEBUG
