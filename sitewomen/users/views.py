@@ -1,29 +1,58 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
-from .forms import LoginUserForm
+from .forms import LoginUserForm, RegisterUserForm
 
 
 # Create your views here.
-def login_user(request):
+# def login_user(request): # перепишем эту функцию с помощью класса LoginView
+#     if request.method == 'POST':
+#         form = LoginUserForm(request.POST)
+#         if form.is_valid():
+#             cd = form.cleaned_data
+#             user = authenticate(request,
+#                                 username=cd['username'],
+#                                 password=cd['password'])  # выполняем аутентификацию пользователя(проверяем есть ли юзер в БД)
+#             if user and user.is_active:
+#                 login(request, user) # выполняем авторизацию(вход в систему)
+#                 return HttpResponseRedirect(reverse('home')) # перенаправляем на главную страницу
+#
+#     else:
+#         form = LoginUserForm()
+#     return render(request, 'users/login.html', {'form': form})
+
+
+class LoginUser(LoginView):
+    # form_class = AuthenticationForm # класс формы, если нужно использовать свою форму LoginUserForm, то нужно ее унаследовать от AuthenticationForm
+    form_class = LoginUserForm
+    template_name = 'users/login.html' # имя шаблона
+    extra_context = {'title': 'Авторизация'} # дополнительные параметры
+
+    # def get_success_url(self): # переопределяем стандартный путь перенаправления при успешной авторизации, или можно
+    #     # в файле settings.py определить следующие переменные:
+    #     # LOGIN_REDIRECT_URL – задает URL - адрес, на который следует перенаправлять пользователя после успешной авторизации;
+    #     # LOGIN_URL – определяет URL - адрес, на который следует перенаправить неавторизованного пользователя при попытке посетить закрытую страницу сайта;
+    #     # LOGOUT_REDIRECT_URL – задает URL - адрес, на который перенаправляется пользователь после выхода.
+    #     return reverse_lazy('home')
+
+
+# def logout_user(request): # вместо этой функции, прямо в пути в файле url.py, прописали класс LogoutView
+#     logout(request) # выполняем выход из системы
+#     return HttpResponseRedirect(reverse('users:login')) # перенаправляем на страницу авторизации
+
+
+def register(request):
     if request.method == 'POST':
-        form = LoginUserForm(request.POST)
+        form = RegisterUserForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
-            user = authenticate(request,
-                                username=cd['username'],
-                                password=cd['password'])  # выполняем аутентификацию пользователя(проверяем есть ли юзер в БД)
-            if user and user.is_active:
-                login(request, user) # выполняем авторизацию(вход в систему)
-                return HttpResponseRedirect(reverse('home')) # перенаправляем на главную страницу
-
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password']) # формирование и шифрование пароля
+            user.save()
+            return render(request, 'users/register_done.html')
     else:
-        form = LoginUserForm()
-    return render(request, 'users/login.html', {'form': form})
-
-
-def logout_user(request):
-    logout(request) # выполняем выход из системы
-    return HttpResponseRedirect(reverse('users:login')) # перенаправляем на страницу авторизации
+        form = RegisterUserForm()
+    return render(request, 'users/register.html', {'form': form})

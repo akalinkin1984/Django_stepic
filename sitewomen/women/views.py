@@ -1,5 +1,7 @@
 import uuid
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -98,6 +100,7 @@ class WomenHome(DataMixin, ListView): # переписали класс WomenHom
 #             destination.write(chunk)
 
 
+@login_required # для доступа к странице только для авторизованных пользователей, можно использовать параметр login_url - куда перенаправить(имеет больший приоритет чем LOGIN_URL в settings.py)
 def about(request):
     # if request.method == 'POST':
     #     # handle_uploaded_file(request.FILES['file_upload']) # сохраняет файл
@@ -248,7 +251,7 @@ class ShowPost(DataMixin, DetailView): # переписали функцию sho
 #         return super().form_valid(form)
 
 
-class AddPage(DataMixin, CreateView): # переписали с помощью класса унаследованного от CreateView(для сохранения данных в БД)
+class AddPage(LoginRequiredMixin, DataMixin, CreateView): # переписали с помощью класса унаследованного от CreateView(для сохранения данных в БД), LoginRequiredMixin для доступа только для авторизованных пользователей
     # form_valid уже реализован в CreateView
     form_class = AddPostForm  # ссылка на класс формы(можно вместо формы указать модель и поля)
     # model = Women
@@ -256,11 +259,17 @@ class AddPage(DataMixin, CreateView): # переписали с помощью �
     template_name = 'women/addpage.html'
     # success_url = reverse_lazy('home')  # можно не прописывать, т.к. url автоматически берется из функции get_absolute_url модели
     title_page = 'Добавление статьи'
+    # login_url = '/admin/' # куда перенаправить неавторизованного пользователя
 
     # extra_context = {
     #     'title': 'Добавление статьи',
     #     'menu': menu
     # }
+
+    def form_valid(self, form): # метод для автоматического заполнения поля author
+        w = form.save(commit=False)
+        w.author = self.request.user
+        return super().form_valid(form)
 
 
 class UpdatePage(DataMixin, UpdateView): # класс для изменения записи

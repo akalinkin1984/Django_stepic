@@ -25,13 +25,23 @@
 {% endfor %}
 <!--				если пользователь авторизован, отображаем его имя-->
 				{% if user.is_authenticated %}
-				<li class="last">{{ user.username }}  | <a href="{% url 'users:logout' %}">Выйти</a> </li>
+<!--				<li class="last">{{ user.username }}  | <a href="{% url 'users:logout' %}">Выйти</a> </li>-->
+				<li class="last">{{ user.username }} |
+    <form method="post" action="{% url 'users:logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" style="background:none; border:none; color:#FDC073; cursor:pointer;
+					font-size: 20px; font-family: Arial;">
+            Выйти
+        </button>
+    </form>
+</li>
 				{% else %}
-				<li class="last"><a href="{% url 'users:login' %}">Войти</a> | <a href="#">Регистрация</a> </li>
+				<li class="last"><a href="{% url 'users:login' %}">Войти</a> | <a href="{% url 'users:register' %}">Регистрация</a> </li>
 				{% endif %}
 			</ul>
 			<div class="clear"></div>
 		</div>
+
 {% endblock mainmenu %}
 
 
