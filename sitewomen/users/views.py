@@ -1,11 +1,13 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, UpdateView
 
-from .forms import LoginUserForm, RegisterUserForm
+from .forms import LoginUserForm, RegisterUserForm, ProfileUserForm, UserPasswordChangeForm
 
 
 # Create your views here.
@@ -45,14 +47,40 @@ class LoginUser(LoginView):
 #     return HttpResponseRedirect(reverse('users:login')) # перенаправляем на страницу авторизации
 
 
-def register(request):
-    if request.method == 'POST':
-        form = RegisterUserForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password']) # формирование и шифрование пароля
-            user.save()
-            return render(request, 'users/register_done.html')
-    else:
-        form = RegisterUserForm()
-    return render(request, 'users/register.html', {'form': form})
+# def register(request): # перепишем эту функцию с помощью класса CreateView
+#     if request.method == 'POST':
+#         form = RegisterUserForm(request.POST)
+#         if form.is_valid():
+#             user = form.save(commit=False)
+#             user.set_password(form.cleaned_data['password']) # формирование и шифрование пароля
+#             user.save()
+#             return render(request, 'users/register_done.html')
+#     else:
+#         form = RegisterUserForm()
+#     return render(request, 'users/register.html', {'form': form})
+
+
+class RegisterUser(CreateView):
+    form_class = RegisterUserForm
+    template_name = 'users/register.html'
+    extra_context = {'title': 'Регистрация'}
+    success_url = reverse_lazy('users:login') # куда перенаправлять при успешной регистрации
+
+
+class ProfileUser(LoginRequiredMixin, UpdateView): # класс для обработки профиля пользователя(LoginRequiredMixin - только для аутентифицированных пользователей)
+    model = get_user_model()
+    form_class = ProfileUserForm
+    template_name = 'users/profile.html'
+    extra_context = {'title': 'Профиль пользователя'}
+
+    def get_success_url(self): # куда перенаправлять если есть изменения и сохранение
+        return reverse_lazy('users:profile') # перенаправляем на текущую страницу
+
+    def get_object(self, queryset=None): # для редактирования только своей записи
+        return self.request.user
+
+
+class UserPasswordChange(PasswordChangeView): # для изменения пароля
+    form_class = UserPasswordChangeForm
+    success_url = reverse_lazy('users:password_change_done')
+    template_name = 'users/password_change_form.html'

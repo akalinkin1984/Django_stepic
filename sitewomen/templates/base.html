@@ -26,7 +26,7 @@
 <!--				если пользователь авторизован, отображаем его имя-->
 				{% if user.is_authenticated %}
 <!--				<li class="last">{{ user.username }}  | <a href="{% url 'users:logout' %}">Выйти</a> </li>-->
-				<li class="last">{{ user.username }} |
+				<li class="last"><a href="{% url 'users:profile' %}">{{user.username}}</a> |
     <form method="post" action="{% url 'users:logout' %}" style="display: inline;">
         {% csrf_token %}
         <button type="submit" style="background:none; border:none; color:#FDC073; cursor:pointer;
