@@ -10,7 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -127,13 +133,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/' # стандартный путь к статике
-STATICFILES_DIRS = [ # нестандартные пути к статике(используем для админ панели)
+STATIC_URL = 'static/'  # стандартный путь к статике
+STATICFILES_DIRS = [  # нестандартные пути к статике(используем для админ панели)
     BASE_DIR / 'static',
 ]
 
-MEDIA_ROOT = BASE_DIR / 'media' # указываем папку где будут все загружаемые файлы
-MEDIA_URL = '/media/' # добавляется к путям файлов
+MEDIA_ROOT = BASE_DIR / 'media'  # указываем папку где будут все загружаемые файлы
+MEDIA_URL = '/media/'  # добавляется к путям файлов
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -144,7 +150,24 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'users:login'
 
-AUTHENTICATION_BACKENDS = [ # бэкенд для авторизации пользователей
-    'django.contrib.auth.backends.ModelBackend', # стандартный бэкенд для авторизации пользователей
-    'users.authentication.EmailAuthBackend' # добавляем свой бэкенд для авторизации пользователей
+AUTHENTICATION_BACKENDS = [  # бэкенд для авторизации пользователей
+    'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд для авторизации пользователей
+    'users.authentication.EmailAuthBackend'  # добавляем свой бэкенд для авторизации пользователей
 ]
+
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"  # для отправки писем в консоль(либо убрать либо вместо console прописать smtp)
+
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_SSL = True
+
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
+
+AUTH_USER_MODEL = 'users.User'  # какую модель юзера используем(если используем AbstractUser, то этот параметр обязателен)
+
+DEFAULT_USER_IMAGE = MEDIA_URL + 'users/default.png'  # путь к фото юзера по-умолчанию
