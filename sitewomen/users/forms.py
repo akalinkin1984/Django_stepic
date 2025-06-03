@@ -73,7 +73,7 @@ class RegisterUserForm(UserCreationForm): # обязательно исполь�
 class ProfileUserForm(forms.ModelForm): # форма для профиля пользователя
     username = forms.CharField(disabled=True, label='Логин', # disabled=True - не сможем редактировать
                                widget=forms.TextInput(attrs={'class': 'form-input'}))
-    email = forms.CharField(disabled=True, label='E-mail',
+    email = forms.CharField(disabled=True, required=False, label='E-mail',
                             widget=forms.TextInput(attrs={'class': 'form-input'}))
     this_year = datetime.date.today().year
     date_birth = forms.DateField(widget=forms.SelectDateWidget(years=tuple(range(this_year-100, this_year-5))))

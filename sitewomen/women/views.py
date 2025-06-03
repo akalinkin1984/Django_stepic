@@ -1,7 +1,7 @@
 import uuid
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseNotFound, Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -251,7 +251,7 @@ class ShowPost(DataMixin, DetailView): # переписали функцию sho
 #         return super().form_valid(form)
 
 
-class AddPage(LoginRequiredMixin, DataMixin, CreateView): # переписали с помощью класса унаследованного от CreateView(для сохранения данных в БД), LoginRequiredMixin для доступа только для авторизованных пользователей
+class AddPage(PermissionRequiredMixin, LoginRequiredMixin, DataMixin, CreateView): # переписали с помощью класса унаследованного от CreateView(для сохранения данных в БД), LoginRequiredMixin для доступа только для авторизованных пользователей, PermissionRequiredMixin - для разрешений авторизованных пользователей
     # form_valid уже реализован в CreateView
     form_class = AddPostForm  # ссылка на класс формы(можно вместо формы указать модель и поля)
     # model = Women
@@ -260,7 +260,8 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView): # переписали
     # success_url = reverse_lazy('home')  # можно не прописывать, т.к. url автоматически берется из функции get_absolute_url модели
     title_page = 'Добавление статьи'
     # login_url = '/admin/' # куда перенаправить неавторизованного пользователя
-
+    permission_required = 'women.add_women'  # разрешение которым должен обладать пользователь чтобы получить доступ к этой странице
+                    #приложение.действие_таблица
     # extra_context = {
     #     'title': 'Добавление статьи',
     #     'menu': menu
@@ -272,12 +273,13 @@ class AddPage(LoginRequiredMixin, DataMixin, CreateView): # переписали
         return super().form_valid(form)
 
 
-class UpdatePage(DataMixin, UpdateView): # класс для изменения записи
+class UpdatePage(PermissionRequiredMixin, DataMixin, UpdateView): # класс для изменения записи
     model = Women
     fields = ['title', 'content', 'photo', 'is_published', 'cat'] # обязательно нужно указать обязательные для заполнения поля
     template_name = 'women/addpage.html'
     success_url = reverse_lazy('home')
     title_page = 'Редактирование статьи'
+    permission_required = 'women.change_women'
 
     # extra_context = {
     #     'title': 'Редактирование статьи',
@@ -299,6 +301,7 @@ class DeletePage(DataMixin, DeleteView): # класс для удаления з
     # }
 
 
+@permission_required(perm='women.add_women', raise_exception=True)  # назначить разрешение для функции, raise_exception - для генерации кода 403
 def contact(request):
     return HttpResponse(f'Обратная связь')
 
