@@ -4,3 +4,6 @@
 .vscode/
 venv/
 __pycache__/
+
+cert.key
+cert.crt

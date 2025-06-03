@@ -35,7 +35,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'sitewomen.ru']
 INTERNAL_IPS = ["127.0.0.1"]
 
 
@@ -153,6 +153,7 @@ LOGIN_URL = 'users:login'
 
 AUTHENTICATION_BACKENDS = [  # бэкенд для авторизации пользователей
     'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.vk.VKOAuth2',
     'django.contrib.auth.backends.ModelBackend',  # стандартный бэкенд для авторизации пользователей
     'users.authentication.EmailAuthBackend'  # добавляем свой бэкенд для авторизации пользователей
 ]
@@ -190,3 +191,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
+
+SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_VK_OAUTH2_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_VK_OAUTH2_SECRET')
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
