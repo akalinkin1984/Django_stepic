@@ -12,7 +12,7 @@ from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
 
 from .models import Women, Category, TagPost, UploadFiles
-from .forms import AddPostForm, UploadFileForm
+from .forms import AddPostForm, UploadFileForm, ContactForm
 from .utils import DataMixin
 
 # menu = ['О сайте', 'Добавить статью', 'Обратная связь', 'Войти']
@@ -301,9 +301,20 @@ class DeletePage(DataMixin, DeleteView): # класс для удаления з
     # }
 
 
-@permission_required(perm='women.add_women', raise_exception=True)  # назначить разрешение для функции, raise_exception - для генерации кода 403
-def contact(request):
-    return HttpResponse(f'Обратная связь')
+# @permission_required(perm='women.add_women', raise_exception=True)  # назначить разрешение для функции, raise_exception - для генерации кода 403
+# def contact(request):
+#     return HttpResponse(f'Обратная связь')
+
+
+class ContactFormView(LoginRequiredMixin, DataMixin, FormView):
+    form_class = ContactForm
+    template_name = 'women/contact.html'
+    success_url = reverse_lazy('home')
+    title_page = 'Обратная связь'
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return super().form_valid(form)
 
 
 def login(request):

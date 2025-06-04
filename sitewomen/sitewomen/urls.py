@@ -29,6 +29,7 @@ urlpatterns = [
     path('', include('women.urls')), # подключение путей из файла women.urls
     path('users/', include('users.urls', namespace='users')), # подключение путей из файла users.urls(namespace - пространство имен, напр. чтобы обратиться к маршруту login, пишем "users:login")
     path("social-auth/", include('social_django.urls', namespace="social")),
+    path("captcha/", include('captcha.urls')),
 ] + debug_toolbar_urls()
 
 if settings.DEBUG: # добавляем маршрут который связывает префикс MEDIA_URL с маршрутом MEDIA_ROOT, для отображения фото в режиме DEBUG
