@@ -10,6 +10,7 @@ from django.template.loader import render_to_string
 from django.template.defaultfilters import slugify # можем использовать шаблонные фильтры как функции
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, FormView, CreateView, UpdateView, DeleteView
+from django.core.cache import cache  # для кэширования на низком уровне (через API)
 
 from .models import Women, Category, TagPost, UploadFiles
 from .forms import AddPostForm, UploadFileForm, ContactForm
@@ -90,7 +91,11 @@ class WomenHome(DataMixin, ListView): # переписали класс WomenHom
     # } # extra_context определили в миксине DataMixin
 
     def get_queryset(self): # выбираем записи из таблицы
-        return Women.published.all().select_related('cat')
+        w_lst = cache.get('women_posts')  # пробуем взять данные из кэша по ключу women_posts
+        if not w_lst:  # если в кэше нет данных, получаем их и заносим в кэш по ключу women_posts
+            w_lst = Women.published.all().select_related('cat')
+            cache.set('women_posts', w_lst, 60)  # 60 - количество секунд которое будет храниться кэш
+        return w_lst
 
 
 # def handle_uploaded_file(f): # функция для загрузки файла

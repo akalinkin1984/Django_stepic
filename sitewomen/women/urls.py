@@ -1,4 +1,5 @@
 from django.urls import path, re_path, register_converter
+from django.views.decorators.cache import cache_page  # для кэширования отдельных страниц сайта
 
 from . import views, converters
 
@@ -7,7 +8,8 @@ register_converter(converters.FourDigitYearConverter, 'year4') # регистр�
 
 urlpatterns = [
     # path('', views.index, name='home'),
-    path('', views.WomenHome.as_view(), name='home'), # в as_view можно передавать словарь с данными для формирования шаблона через параметр extra_context, данные будут браться отсюда, а не из функции представления
+    path('', views.WomenHome.as_view(), name='home'),  # в as_view можно передавать словарь с данными для формирования шаблона через параметр extra_context, данные будут браться отсюда, а не из функции представления
+    # path('', cache_page(30)(views.WomenHome.as_view()), name='home'),  # с использование кэша
     path('about/', views.about, name='about'),
     # path('addpage/', views.addpage, name='add_page'),
     path('addpage/', views.AddPage.as_view(), name='add_page'), # регестрируем класс с помощью метода as_view()

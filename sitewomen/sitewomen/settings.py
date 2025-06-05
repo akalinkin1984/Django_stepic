@@ -54,18 +54,26 @@ INSTALLED_APPS = [
     'users',
     'social_django',
     'captcha',
+    'django.contrib.sites',  # для карты сайта
+    'django.contrib.sitemaps',  # для карты сайта
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'django.middleware.cache.UpdateCacheMiddleware',  # для кэширования на уровне всего сайта(все подряд)
     'django.middleware.common.CommonMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',  # для кэширования на уровне всего сайта(порядок важен)
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+# CACHE_MIDDLEWARE_ALIAS = 'default'  # для кэширования на уровне всего сайта
+# CACHE_MIDDLEWARE_SECONDS = 10  # для кэширования на уровне всего сайта
+# CACHE_MIDDLEWARE_KEY_PREFIX = 'sitewomen'  # для кэширования на уровне всего сайта
 
 ROOT_URLCONF = 'sitewomen.urls'
 
@@ -205,3 +213,13 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_VK_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_VK_OAUTH2_KEY')
 SOCIAL_AUTH_VK_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_VK_OAUTH2_SECRET')
 SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
+
+CACHES = {  # для кэширования через Redis(установили redis и для быстродействия hiredis)(нужно запустить сервер redis)
+    "default": {
+        # "BACKEND": "django.core.cache.backends.dummy.DummyCache",  # отключает кэш, чтобы видеть все SQL запросы при разработке
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
+
+SITE_ID = 1  # для карты сайта

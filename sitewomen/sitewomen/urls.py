@@ -18,9 +18,17 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from debug_toolbar.toolbar import debug_toolbar_urls
+from django.contrib.sitemaps.views import sitemap  # для карты сайта
+from django.views.decorators.cache import cache_page
 
 from sitewomen import settings
 from women import views
+from women.sitemaps import PostSitemap, CategorySitemap
+
+sitemaps = {  # словарь который будем передавать в функцию sitemap
+    'posts': PostSitemap,
+    'cats': CategorySitemap,
+}
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +38,7 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')), # подключение путей из файла users.urls(namespace - пространство имен, напр. чтобы обратиться к маршруту login, пишем "users:login")
     path("social-auth/", include('social_django.urls', namespace="social")),
     path("captcha/", include('captcha.urls')),
+    path("sitemap.xml", cache_page(86400)(sitemap), {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),  # путь для карты сайта
 ] + debug_toolbar_urls()
 
 if settings.DEBUG: # добавляем маршрут который связывает префикс MEDIA_URL с маршрутом MEDIA_ROOT, для отображения фото в режиме DEBUG
