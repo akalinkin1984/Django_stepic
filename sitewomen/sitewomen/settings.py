@@ -33,10 +33,10 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 #
 # ALLOWED_HOSTS = []
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'sitewomen.ru']
-INTERNAL_IPS = ["127.0.0.1"]
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
+# INTERNAL_IPS = ["127.0.0.1"]
 
 
 # Application definition
@@ -153,9 +153,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'  # стандартный путь к статике
-STATICFILES_DIRS = [  # нестандартные пути к статике(используем для админ панели)
-    BASE_DIR / 'static',
-]
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+# STATICFILES_DIRS = [  # нестандартные пути к статике(используем для админ панели)
+#     BASE_DIR / 'static',
+# ]
 
 MEDIA_ROOT = BASE_DIR / 'media'  # указываем папку где будут все загружаемые файлы
 MEDIA_URL = '/media/'  # добавляется к путям файлов

@@ -1,0 +1,70 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-server
+    restart: always
+    networks:
+      - dbnet
+    expose:
+      - 8088
+    ports:
+      - "80:8088"
+    volumes:
+      - ./sitewomen/static:/app/www/sitewomen/static
+      - ./sitewomen/media:/app/www/sitewomen/media
+      - ./sitewomen/logs:/app/www/sitewomen/logs
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - sitewomen
+
+
+  sitewomen:
+    build: ./sitewomen
+    image: sitewomen
+    container_name: sitewomen
+    restart: always
+    # command: "python manage.py runserver 0.0.0.0:8000"
+    command: "gunicorn -c gunicorn.py sitewomen.wsgi"
+    env_file:
+      - .env
+    links:
+      - "postgres:dbps"
+    networks:
+      - dbnet
+    volumes:
+      - ./sitewomen:/app/www/sitewomen
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8080:8080"
+    links:
+      - "postgres:db"
+    networks:
+      - dbnet
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: psgr
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${PG_NAME}
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+    networks:
+      - dbnet
+
+networks:
+  dbnet:
+  driver: bridge
+
+volumes:
+  postgres-data
