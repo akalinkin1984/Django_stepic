@@ -37,6 +37,7 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+      - redis
 
   adminer:
     image: adminer
@@ -62,9 +63,17 @@ services:
     networks:
       - dbnet
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - dbnet
+
 networks:
   dbnet:
-  driver: bridge
+    driver: bridge
 
 volumes:
-  postgres-data
+  postgres-data:
