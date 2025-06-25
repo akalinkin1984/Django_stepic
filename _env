@@ -1,0 +1,19 @@
+SECRET_KEY='django-insecure-nu$rsnglw-+_)vrm1@m_8*=4wqgdp(yqddfexhm@ztcqjvjx6k'
+ALLOWED_HOSTS=127.0.0.1 localhost [::1]
+ 
+EMAIL_HOST=smtp.yandex.ru
+EMAIL_PORT=465
+EMAIL_HOST_USER=prostotak-pocht@yandex.ru
+EMAIL_HOST_PASSWORD=dqiajkgiyxozkjiw
+ 
+SOCIAL_AUTH_GITHUB_KEY=Ov23litICtrlaH8fWQvz
+SOCIAL_AUTH_GITHUB_SECRET=a804bf9906e0b450d4b056cb36f0e36be87420d6
+ 
+SOCIAL_AUTH_VK_OAUTH2_KEY=53680041
+SOCIAL_AUTH_VK_OAUTH2_SECRET=9u6hjtWJRpOtJudBx378
+ 
+PG_NAME=sitewomen_db
+PG_USER=sitewomen
+PG_PASSWORD=12345
+PG_HOST=dbps
+PG_PORT=5432
